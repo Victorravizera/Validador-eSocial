@@ -1,7 +1,7 @@
-import { api } from "../lib/api";
+import { api } from "../../lib/api";
 import { redirect } from "next/navigation";
-import { ApiError } from "../lib/api";
-import { ScoreChart } from "../components/charts/ScoreChart";
+import { ApiError } from "../../lib/api";
+import { ScoreChart } from "../../components/charts/ScoreChart";
 
 export default async function DashboardPage() {
   let me, history;

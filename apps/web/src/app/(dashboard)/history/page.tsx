@@ -1,4 +1,4 @@
-import { api, ApiError } from "../../lib/api";
+import { api, ApiError } from "../../../lib/api";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 

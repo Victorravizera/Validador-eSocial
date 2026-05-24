@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { Sidebar } from "../components/layout/Sidebar";
+import { Sidebar } from "../../components/layout/Sidebar";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const store = await cookies();

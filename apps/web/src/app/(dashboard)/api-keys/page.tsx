@@ -1,6 +1,7 @@
-import { api, ApiError } from "../../lib/api";
+import { api, ApiError } from "../../../lib/api";
+import { ApiKeysList } from "../../../components/ui/ApiKeysList";
 import { redirect } from "next/navigation";
-import { ApiKeysList } from "../../components/ui/ApiKeysList";
+
 
 export default async function ApiKeysPage() {
   let keys;
