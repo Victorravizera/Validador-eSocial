@@ -10,5 +10,9 @@
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "clean": "pnpm -r clean && rm -rf node_modules"
+  },
+  "dependencies": {
+    "pino": "^9.0.0",
+    "zod": "^3.22.4"
   }
 }

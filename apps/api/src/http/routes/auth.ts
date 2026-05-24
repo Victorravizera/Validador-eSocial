@@ -10,26 +10,43 @@ const RegisterSchema = z.object({
   password: z.string().min(8).regex(/[A-Z]/, "Deve ter maiúscula").regex(/[0-9]/, "Deve ter número"),
   plan: z.enum(["starter", "pro", "enterprise"]).optional(),
 });
-const LoginSchema = z.object({ email: z.string().email(), password: z.string().min(1) });
+
+const LoginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
 
 export async function authRoutes(app: FastifyInstance): Promise<void> {
   app.post("/auth/register", { schema: { tags: ["Auth"] } }, async (request, reply) => {
     const body = RegisterSchema.parse(request.body);
-    const result = await AuthService.register(body);
+    const result = await AuthService.register({
+      tenantName: body.tenantName,
+      email: body.email,
+      password: body.password,
+      plan: body.plan,
+    });
     return reply.status(201).send({
-      tenantId: result.tenantId, apiKey: result.apiKey,
+      tenantId: result.tenantId,
+      apiKey: result.apiKey,
       warning: "Guarde sua API Key agora. Ela não será exibida novamente.",
     });
   });
 
   app.post("/auth/login", { schema: { tags: ["Auth"] } }, async (request, reply) => {
     const body = LoginSchema.parse(request.body);
-    return reply.status(200).send(await AuthService.login(body));
+    const result = await AuthService.login({
+      email: body.email,
+      password: body.password,
+    });
+    return reply.status(200).send(result);
   });
 
   app.get("/auth/api-keys", { preHandler: [requireApiKey], schema: { tags: ["Auth"] } }, async (request, reply) => {
     const keys = await ApiKeyRepository.listByTenant(request.tenant!.id);
-    return reply.send(keys.map((k) => ({ id: k.id, name: k.name, lastUsedAt: k.lastUsedAt, expiresAt: k.expiresAt, createdAt: k.createdAt })));
+    return reply.send(keys.map((k) => ({
+      id: k.id, name: k.name, lastUsedAt: k.lastUsedAt,
+      expiresAt: k.expiresAt, createdAt: k.createdAt,
+    })));
   });
 
   app.post("/auth/api-keys", { preHandler: [requireApiKey], schema: { tags: ["Auth"] } }, async (request, reply) => {

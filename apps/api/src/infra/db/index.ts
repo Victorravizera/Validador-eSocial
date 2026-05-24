@@ -7,8 +7,6 @@ let _db: ReturnType<typeof postgres> | null = null;
 export function getDb(): ReturnType<typeof postgres> {
   if (_db) return _db;
   _db = postgres(config.db.url, {
-    min: config.db.poolMin,
-    max: config.db.poolMax,
     idle_timeout: 30,
     connect_timeout: 10,
     ssl: config.server.isProd ? { rejectUnauthorized: true } : false,

@@ -1,9 +1,26 @@
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
     "outDir": "./dist",
-    "rootDir": "./src"
+    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "zod": ["../../node_modules/zod/lib/index.d.ts"],
+      "pino": ["../../node_modules/pino/pino.d.ts"]
+    }
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "../../shared/**/*",
+    "../../config/**/*",
+    "../../rules/**/*"
+  ],
   "exclude": ["node_modules", "dist", "test/**/*"]
 }
