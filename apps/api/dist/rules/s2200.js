@@ -1,9 +1,12 @@
-import { isValidCPF, parseDate, getAgeInYears, isFutureDate, getSalarioMinimo, } from "../shared/utils/validators.js";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.s2200Rules = void 0;
+const validators_js_1 = require("../shared/utils/validators.js");
 const UND_SAL_FIXO_VALID = ["1", "2", "3", "4", "5", "6", "7"];
 const TP_REG_TRAB_VALID = ["1", "2"];
 const TP_JORNADA_VALID = ["1", "2", "3", "4", "9"];
 const COD_CATEG_CLT_PREFIXES = ["1"]; // simplificado
-export const s2200Rules = [
+exports.s2200Rules = [
     // ── CPF ────────────────────────────────────────────────────────────────────
     {
         code: "S2200_CPF_REQUIRED",
@@ -25,7 +28,7 @@ export const s2200Rules = [
         validate: ({ cpfTrab }) => {
             if (!cpfTrab || typeof cpfTrab !== "string")
                 return null; // coberto pela regra anterior
-            if (!isValidCPF(cpfTrab)) {
+            if (!(0, validators_js_1.isValidCPF)(cpfTrab)) {
                 return { field: "cpfTrab", code: "S2200_CPF_INVALID", message: "CPF inválido — verifique os dígitos verificadores", severity: "error" };
             }
             return null;
@@ -66,7 +69,7 @@ export const s2200Rules = [
             if (!dtNascto || typeof dtNascto !== "string") {
                 return { field: "dtNascto", code: "S2200_DTNASCTO_REQUIRED", message: "Data de nascimento é obrigatória no formato YYYY-MM-DD", severity: "error" };
             }
-            if (!parseDate(dtNascto)) {
+            if (!(0, validators_js_1.parseDate)(dtNascto)) {
                 return { field: "dtNascto", code: "S2200_DTNASCTO_INVALID", message: "Data de nascimento inválida — use o formato YYYY-MM-DD", severity: "error" };
             }
             return null;
@@ -80,10 +83,10 @@ export const s2200Rules = [
         validate: ({ dtNascto }) => {
             if (typeof dtNascto !== "string")
                 return null;
-            const birth = parseDate(dtNascto);
+            const birth = (0, validators_js_1.parseDate)(dtNascto);
             if (!birth)
                 return null;
-            if (getAgeInYears(birth) < 14) {
+            if ((0, validators_js_1.getAgeInYears)(birth) < 14) {
                 return { field: "dtNascto", code: "S2200_IDADE_MINIMA", message: "Trabalhador deve ter no mínimo 14 anos (art. 7º, XXXIII CF/88)", severity: "error" };
             }
             return null;
@@ -97,10 +100,10 @@ export const s2200Rules = [
         validate: ({ dtNascto }) => {
             if (typeof dtNascto !== "string")
                 return null;
-            const birth = parseDate(dtNascto);
+            const birth = (0, validators_js_1.parseDate)(dtNascto);
             if (!birth)
                 return null;
-            if (getAgeInYears(birth) > 100) {
+            if ((0, validators_js_1.getAgeInYears)(birth) > 100) {
                 return { field: "dtNascto", code: "S2200_IDADE_IMPROVAVEL", message: "Idade acima de 100 anos — verifique a data de nascimento", severity: "warning" };
             }
             return null;
@@ -116,7 +119,7 @@ export const s2200Rules = [
             if (!dtAdm || typeof dtAdm !== "string") {
                 return { field: "dtAdm", code: "S2200_DTADM_REQUIRED", message: "Data de admissão é obrigatória no formato YYYY-MM-DD", severity: "error" };
             }
-            if (!parseDate(dtAdm)) {
+            if (!(0, validators_js_1.parseDate)(dtAdm)) {
                 return { field: "dtAdm", code: "S2200_DTADM_INVALID", message: "Data de admissão inválida — use o formato YYYY-MM-DD", severity: "error" };
             }
             return null;
@@ -130,8 +133,8 @@ export const s2200Rules = [
         validate: ({ dtAdm }) => {
             if (typeof dtAdm !== "string")
                 return null;
-            const d = parseDate(dtAdm);
-            if (d && isFutureDate(d)) {
+            const d = (0, validators_js_1.parseDate)(dtAdm);
+            if (d && (0, validators_js_1.isFutureDate)(d)) {
                 return { field: "dtAdm", code: "S2200_DTADM_FUTURA", message: "Data de admissão não pode ser uma data futura", severity: "error" };
             }
             return null;
@@ -145,8 +148,8 @@ export const s2200Rules = [
         validate: ({ dtAdm, dtNascto }) => {
             if (typeof dtAdm !== "string" || typeof dtNascto !== "string")
                 return null;
-            const adm = parseDate(dtAdm);
-            const nasc = parseDate(dtNascto);
+            const adm = (0, validators_js_1.parseDate)(dtAdm);
+            const nasc = (0, validators_js_1.parseDate)(dtNascto);
             if (adm && nasc && adm <= nasc) {
                 return { field: "dtAdm", code: "S2200_DTADM_ANTES_NASCTO", message: "Data de admissão não pode ser anterior ou igual à data de nascimento", severity: "error" };
             }
@@ -190,11 +193,11 @@ export const s2200Rules = [
             if (isNaN(valor))
                 return null;
             const und = String(undSalFixo);
-            if (und === "1" && valor < getSalarioMinimo()) {
+            if (und === "1" && valor < (0, validators_js_1.getSalarioMinimo)()) {
                 return {
                     field: "vrSalFx",
                     code: "S2200_SALARIO_MINIMO",
-                    message: `Salário (R$ ${valor.toFixed(2)}) abaixo do mínimo vigente (R$ ${getSalarioMinimo().toFixed(2)})`,
+                    message: `Salário (R$ ${valor.toFixed(2)}) abaixo do mínimo vigente (R$ ${(0, validators_js_1.getSalarioMinimo)().toFixed(2)})`,
                     severity: "error",
                 };
             }

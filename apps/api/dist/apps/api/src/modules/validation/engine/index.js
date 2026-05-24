@@ -1,19 +1,24 @@
-import { performance } from "node:perf_hooks";
-import { InvalidEventIdError } from "../../../../../../shared/errors.js";
-import { s2200Rules } from "../../../../../../rules/s2200.js";
-import { s2230Rules } from "../../../../../../rules/s2230.js";
-import { s1200Rules } from "../../../../../../rules/s1200.js";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.validateEvent = validateEvent;
+exports.validateBatch = validateBatch;
+exports.getSupportedEvents = getSupportedEvents;
+const node_perf_hooks_1 = require("node:perf_hooks");
+const errors_js_1 = require("../../../../../../shared/errors.js");
+const s2200_js_1 = require("../../../../../../rules/s2200.js");
+const s2230_js_1 = require("../../../../../../rules/s2230.js");
+const s1200_js_1 = require("../../../../../../rules/s1200.js");
 const RULES_REGISTRY = {
-    "S-2200": s2200Rules,
-    "S-2230": s2230Rules,
-    "S-1200": s1200Rules,
+    "S-2200": s2200_js_1.s2200Rules,
+    "S-2230": s2230_js_1.s2230Rules,
+    "S-1200": s1200_js_1.s1200Rules,
 };
-export function validateEvent(request) {
+function validateEvent(request) {
     const { eventId, payload, options } = request;
-    const start = performance.now();
+    const start = node_perf_hooks_1.performance.now();
     const rules = RULES_REGISTRY[eventId];
     if (!rules)
-        throw new InvalidEventIdError(eventId);
+        throw new errors_js_1.InvalidEventIdError(eventId);
     const issues = [];
     let errorRuleCount = 0;
     for (const rule of rules) {
@@ -45,13 +50,13 @@ export function validateEvent(request) {
         eventId, status, score, issues,
         passedRules: rules.length - issues.length,
         totalRules: rules.length,
-        durationMs: Math.round(performance.now() - start),
+        durationMs: Math.round(node_perf_hooks_1.performance.now() - start),
     };
 }
-export function validateBatch(request) {
+function validateBatch(request) {
     const { events, options } = request;
     const batchId = crypto.randomUUID();
-    const start = performance.now();
+    const start = node_perf_hooks_1.performance.now();
     const results = [];
     let passed = 0, failed = 0, warned = 0;
     for (const event of events) {
@@ -71,9 +76,9 @@ export function validateBatch(request) {
         : Math.round(results.reduce((acc, r) => acc + r.score, 0) / results.length);
     return {
         batchId, totalEvents: results.length, passed, failed, warned,
-        overallScore, results, durationMs: Math.round(performance.now() - start),
+        overallScore, results, durationMs: Math.round(node_perf_hooks_1.performance.now() - start),
     };
 }
-export function getSupportedEvents() {
+function getSupportedEvents() {
     return Object.keys(RULES_REGISTRY);
 }

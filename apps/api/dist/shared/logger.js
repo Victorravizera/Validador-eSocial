@@ -1,7 +1,13 @@
-import pino from "pino";
-import { config } from "../config/index.js";
-export const logger = pino({
-    level: config.server.logLevel,
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.logger = void 0;
+const pino_1 = __importDefault(require("pino"));
+const index_js_1 = require("../config/index.js");
+exports.logger = (0, pino_1.default)({
+    level: index_js_1.config.server.logLevel,
     redact: {
         paths: [
             "password", "senha", "token", "accessToken", "refreshToken",
@@ -11,18 +17,18 @@ export const logger = pino({
         ],
         censor: "[REDACTED]",
     },
-    transport: config.server.isDev
+    transport: index_js_1.config.server.isDev
         ? { target: "pino-pretty", options: { colorize: true, translateTime: "HH:MM:ss" } }
         : undefined,
     base: {
         service: "esocial-qa-api",
-        env: config.server.env,
+        env: index_js_1.config.server.env,
     },
     serializers: {
         err: (err) => ({
             type: err.constructor.name,
             message: err.message,
-            stack: config.server.isDev ? err.stack : undefined,
+            stack: index_js_1.config.server.isDev ? err.stack : undefined,
         }),
     },
 });

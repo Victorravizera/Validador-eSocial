@@ -1,11 +1,14 @@
-import { getDb } from "../../infra/db/index.js";
-import { createHash, randomBytes } from "node:crypto";
-import { config } from "../../../../../config/index.js";
-import { NotFoundError, UnauthorizedError } from "../../../../../shared/errors.js";
-export const ApiKeyRepository = {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ApiKeyRepository = void 0;
+const index_js_1 = require("../../infra/db/index.js");
+const node_crypto_1 = require("node:crypto");
+const index_js_2 = require("../../../../../config/index.js");
+const errors_js_1 = require("../../../../../shared/errors.js");
+exports.ApiKeyRepository = {
     async create(tenantId, name) {
-        const db = getDb();
-        const plainKey = `eqa_${randomBytes(32).toString("hex")}`;
+        const db = (0, index_js_1.getDb)();
+        const plainKey = `eqa_${(0, node_crypto_1.randomBytes)(32).toString("hex")}`;
         const keyHash = hashApiKey(plainKey);
         const [record] = await db `
       INSERT INTO api_keys (tenant_id, key_hash, name)
@@ -16,7 +19,7 @@ export const ApiKeyRepository = {
         return { record, plainKey };
     },
     async validate(plainKey) {
-        const db = getDb();
+        const db = (0, index_js_1.getDb)();
         const keyHash = hashApiKey(plainKey);
         const [row] = await db `
       SELECT tenant_id AS "tenantId", id FROM api_keys
@@ -24,12 +27,12 @@ export const ApiKeyRepository = {
         AND (expires_at IS NULL OR expires_at > NOW())
     `;
         if (!row)
-            throw new UnauthorizedError("API Key inválida ou revogada");
+            throw new errors_js_1.UnauthorizedError("API Key inválida ou revogada");
         db `UPDATE api_keys SET last_used_at = NOW() WHERE id = ${row.id}`.catch(() => { });
         return row.tenantId;
     },
     async listByTenant(tenantId) {
-        const db = getDb();
+        const db = (0, index_js_1.getDb)();
         return db `
       SELECT id, tenant_id AS "tenantId", name,
         last_used_at AS "lastUsedAt", expires_at AS "expiresAt", created_at AS "createdAt"
@@ -38,15 +41,15 @@ export const ApiKeyRepository = {
     `;
     },
     async revoke(id, tenantId) {
-        const db = getDb();
+        const db = (0, index_js_1.getDb)();
         const result = await db `
       UPDATE api_keys SET revoked_at = NOW()
       WHERE id = ${id} AND tenant_id = ${tenantId} AND revoked_at IS NULL
     `;
         if (result.count === 0)
-            throw new NotFoundError("API Key");
+            throw new errors_js_1.NotFoundError("API Key");
     },
 };
 function hashApiKey(plainKey) {
-    return createHash("sha256").update(config.auth.apiKeySalt + plainKey).digest("hex");
+    return (0, node_crypto_1.createHash)("sha256").update(index_js_2.config.auth.apiKeySalt + plainKey).digest("hex");
 }

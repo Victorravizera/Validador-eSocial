@@ -1,7 +1,11 @@
-import { requireApiKey } from "../middlewares/auth.js";
-import { getDb } from "../../infra/db/index.js";
-export async function meRoute(app) {
-    app.get("/me", { preHandler: [requireApiKey], schema: { tags: ["Tenant"] } }, async (request, reply) => {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.meRoute = meRoute;
+exports.historyRoute = historyRoute;
+const auth_js_1 = require("../middlewares/auth.js");
+const index_js_1 = require("../../infra/db/index.js");
+async function meRoute(app) {
+    app.get("/me", { preHandler: [auth_js_1.requireApiKey], schema: { tags: ["Tenant"] } }, async (request, reply) => {
         const { tenant } = request;
         const remaining = Math.max(0, tenant.monthlyQuota - tenant.usedThisMonth);
         const percentUsed = Math.round((tenant.usedThisMonth / tenant.monthlyQuota) * 100);
@@ -9,9 +13,9 @@ export async function meRoute(app) {
             quota: { monthly: tenant.monthlyQuota, used: tenant.usedThisMonth, remaining, percentUsed } });
     });
 }
-export async function historyRoute(app) {
-    app.get("/history", { preHandler: [requireApiKey], schema: { tags: ["Validação"] } }, async (request, reply) => {
-        const db = getDb();
+async function historyRoute(app) {
+    app.get("/history", { preHandler: [auth_js_1.requireApiKey], schema: { tags: ["Validação"] } }, async (request, reply) => {
+        const db = (0, index_js_1.getDb)();
         const { page = 1, limit = 20, eventId, status } = request.query;
         const offset = (page - 1) * limit;
         const tenantId = request.tenant.id;

@@ -1,8 +1,11 @@
-import { isValidCPF, parsePeriod, isFutureDate, getSalarioMinimo } from "../shared/utils/validators.js";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.s1200Rules = void 0;
+const validators_js_1 = require("../shared/utils/validators.js");
 // Alíquotas INSS 2024 — tabela simplificada para validação de range
 const INSS_ALIQUOTA_MIN = 0.075;
 const INSS_ALIQUOTA_MAX = 0.14;
-export const s1200Rules = [
+exports.s1200Rules = [
     {
         code: "S1200_PERIODO_REQUIRED",
         field: "perApur",
@@ -12,7 +15,7 @@ export const s1200Rules = [
             if (!perApur || typeof perApur !== "string") {
                 return { field: "perApur", code: "S1200_PERIODO_REQUIRED", message: "Período de apuração é obrigatório (formato: AAAA-MM)", severity: "error" };
             }
-            if (!parsePeriod(perApur)) {
+            if (!(0, validators_js_1.parsePeriod)(perApur)) {
                 return { field: "perApur", code: "S1200_PERIODO_INVALID", message: "Período de apuração inválido — use o formato AAAA-MM (ex: 2024-03)", severity: "error" };
             }
             return null;
@@ -26,8 +29,8 @@ export const s1200Rules = [
         validate: ({ perApur }) => {
             if (typeof perApur !== "string")
                 return null;
-            const d = parsePeriod(perApur);
-            if (d && isFutureDate(d)) {
+            const d = (0, validators_js_1.parsePeriod)(perApur);
+            if (d && (0, validators_js_1.isFutureDate)(d)) {
                 return { field: "perApur", code: "S1200_PERIODO_FUTURO", message: "Período de apuração não pode ser futuro", severity: "error" };
             }
             return null;
@@ -42,7 +45,7 @@ export const s1200Rules = [
             if (!cpfTrab || typeof cpfTrab !== "string") {
                 return { field: "cpfTrab", code: "S1200_CPF_REQUIRED", message: "CPF do trabalhador é obrigatório", severity: "error" };
             }
-            if (!isValidCPF(cpfTrab)) {
+            if (!(0, validators_js_1.isValidCPF)(cpfTrab)) {
                 return { field: "cpfTrab", code: "S1200_CPF_INVALID", message: "CPF inválido", severity: "error" };
             }
             return null;
@@ -73,11 +76,11 @@ export const s1200Rules = [
             const v = Number(vrRemun);
             if (isNaN(v))
                 return null;
-            if (String(tpRegTrab) === "1" && v < getSalarioMinimo()) {
+            if (String(tpRegTrab) === "1" && v < (0, validators_js_1.getSalarioMinimo)()) {
                 return {
                     field: "vrRemun",
                     code: "S1200_REMUN_SALARIO_MINIMO",
-                    message: `Remuneração (R$ ${v.toFixed(2)}) abaixo do salário mínimo vigente (R$ ${getSalarioMinimo().toFixed(2)})`,
+                    message: `Remuneração (R$ ${v.toFixed(2)}) abaixo do salário mínimo vigente (R$ ${(0, validators_js_1.getSalarioMinimo)().toFixed(2)})`,
                     severity: "warning",
                 };
             }

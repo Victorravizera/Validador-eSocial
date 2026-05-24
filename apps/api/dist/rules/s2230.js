@@ -1,4 +1,7 @@
-import { isValidCPF, parseDate, isFutureDate } from "../shared/utils/validators.js";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.s2230Rules = void 0;
+const validators_js_1 = require("../shared/utils/validators.js");
 // Tabela 18 do eSocial — códigos válidos (principais)
 const CODIGOS_AFASTAMENTO = new Set([
     "01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
@@ -6,7 +9,7 @@ const CODIGOS_AFASTAMENTO = new Set([
     "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
     "31", "33", "34", "35", "36",
 ]);
-export const s2230Rules = [
+exports.s2230Rules = [
     {
         code: "S2230_CPF_REQUIRED",
         field: "cpfTrab",
@@ -16,7 +19,7 @@ export const s2230Rules = [
             if (!cpfTrab || typeof cpfTrab !== "string") {
                 return { field: "cpfTrab", code: "S2230_CPF_REQUIRED", message: "CPF do trabalhador é obrigatório", severity: "error" };
             }
-            if (!isValidCPF(cpfTrab)) {
+            if (!(0, validators_js_1.isValidCPF)(cpfTrab)) {
                 return { field: "cpfTrab", code: "S2230_CPF_INVALID", message: "CPF inválido", severity: "error" };
             }
             return null;
@@ -31,7 +34,7 @@ export const s2230Rules = [
             if (!dtIniAfast || typeof dtIniAfast !== "string") {
                 return { field: "dtIniAfast", code: "S2230_DT_INI_REQUIRED", message: "Data de início do afastamento é obrigatória (YYYY-MM-DD)", severity: "error" };
             }
-            if (!parseDate(dtIniAfast)) {
+            if (!(0, validators_js_1.parseDate)(dtIniAfast)) {
                 return { field: "dtIniAfast", code: "S2230_DT_INI_INVALID", message: "Data de início inválida — use YYYY-MM-DD", severity: "error" };
             }
             return null;
@@ -45,8 +48,8 @@ export const s2230Rules = [
         validate: ({ dtIniAfast }) => {
             if (typeof dtIniAfast !== "string")
                 return null;
-            const d = parseDate(dtIniAfast);
-            if (d && isFutureDate(d)) {
+            const d = (0, validators_js_1.parseDate)(dtIniAfast);
+            if (d && (0, validators_js_1.isFutureDate)(d)) {
                 return { field: "dtIniAfast", code: "S2230_DT_INI_FUTURA", message: "Data de início do afastamento não pode ser futura", severity: "error" };
             }
             return null;
@@ -75,8 +78,8 @@ export const s2230Rules = [
         validate: ({ dtIniAfast, dtFimAfast }) => {
             if (!dtFimAfast || typeof dtFimAfast !== "string")
                 return null;
-            const ini = typeof dtIniAfast === "string" ? parseDate(dtIniAfast) : null;
-            const fim = parseDate(dtFimAfast);
+            const ini = typeof dtIniAfast === "string" ? (0, validators_js_1.parseDate)(dtIniAfast) : null;
+            const fim = (0, validators_js_1.parseDate)(dtFimAfast);
             if (ini && fim && fim <= ini) {
                 return { field: "dtFimAfast", code: "S2230_DT_FIM_ANTERIOR_INICIO", message: "Data fim do afastamento deve ser posterior à data de início", severity: "error" };
             }

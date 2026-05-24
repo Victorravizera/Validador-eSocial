@@ -1,10 +1,14 @@
+"use strict";
 /**
  * Hierarquia de erros de domínio.
  *
  * Regra: NUNCA retorne stack traces ou detalhes internos ao cliente.
  * O handler global do Fastify converte esses erros em respostas HTTP seguras.
  */
-export class AppError extends Error {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.NotFoundError = exports.ForbiddenError = exports.UnauthorizedError = exports.BatchTooLargeError = exports.InvalidEventIdError = exports.ValidationError = exports.AppError = void 0;
+exports.isOperationalError = isOperationalError;
+class AppError extends Error {
     code;
     statusCode;
     isOperational;
@@ -17,40 +21,47 @@ export class AppError extends Error {
         Error.captureStackTrace(this, this.constructor);
     }
 }
-export class ValidationError extends AppError {
+exports.AppError = AppError;
+class ValidationError extends AppError {
     constructor(message) {
         super(message, "VALIDATION_ERROR", 422);
     }
 }
-export class InvalidEventIdError extends AppError {
+exports.ValidationError = ValidationError;
+class InvalidEventIdError extends AppError {
     constructor(eventId) {
         super(`Evento não suportado: ${eventId}`, "INVALID_EVENT_ID", 400);
     }
 }
-export class BatchTooLargeError extends AppError {
+exports.InvalidEventIdError = InvalidEventIdError;
+class BatchTooLargeError extends AppError {
     constructor(max) {
         super(`Batch excede o limite de ${max} eventos por requisição`, "BATCH_TOO_LARGE", 400);
     }
 }
-export class UnauthorizedError extends AppError {
+exports.BatchTooLargeError = BatchTooLargeError;
+class UnauthorizedError extends AppError {
     constructor(message = "Não autorizado") {
         super(message, "UNAUTHORIZED", 401);
     }
 }
-export class ForbiddenError extends AppError {
+exports.UnauthorizedError = UnauthorizedError;
+class ForbiddenError extends AppError {
     constructor(message = "Acesso negado") {
         super(message, "FORBIDDEN", 403);
     }
 }
-export class NotFoundError extends AppError {
+exports.ForbiddenError = ForbiddenError;
+class NotFoundError extends AppError {
     constructor(resource) {
         super(`${resource} não encontrado`, "NOT_FOUND", 404);
     }
 }
+exports.NotFoundError = NotFoundError;
 /**
  * Verifica se o erro é operacional (esperado) ou inesperado (bug).
  * Erros inesperados devem acionar alertas no Sentry/PagerDuty.
  */
-export function isOperationalError(err) {
+function isOperationalError(err) {
     return err instanceof AppError && err.isOperational;
 }
