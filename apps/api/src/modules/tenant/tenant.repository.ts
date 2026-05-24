@@ -1,16 +1,11 @@
 import { getDb } from "../../infra/db/index.js";
-import type { Tenant, Plan } from "../../../../shared/types.js";
-import { NotFoundError } from "../../../../shared/errors.js";
+import type { Tenant, Plan } from "../../../../../shared/types.js";
+import { NotFoundError } from "../../../../../shared/errors.js";
 
-export interface CreateTenantInput {
-  name: string;
-  plan: Plan;
-}
+export interface CreateTenantInput { name: string; plan: Plan; }
 
 const QUOTA_BY_PLAN: Record<Plan, number> = {
-  starter: 5_000,
-  pro: 50_000,
-  enterprise: 999_999_999,
+  starter: 5_000, pro: 50_000, enterprise: 999_999_999,
 };
 
 export const TenantRepository = {
@@ -29,8 +24,7 @@ export const TenantRepository = {
     const db = getDb();
     const yearMonth = new Date().toISOString().slice(0, 7);
     const [row] = await db<Array<Tenant & { usedThisMonth: number }>>`
-      SELECT
-        t.id, t.name, t.plan,
+      SELECT t.id, t.name, t.plan,
         t.monthly_quota AS "monthlyQuota",
         COALESCE(q.used, 0) AS "usedThisMonth"
       FROM tenants t

@@ -1,11 +1,11 @@
-import type { Rule } from "@/shared/types/index.js";
+import type { Rule } from "../shared/types.js";
 import {
   isValidCPF,
   parseDate,
   getAgeInYears,
   isFutureDate,
   getSalarioMinimo,
-} from "@/shared/utils/validators.js";
+} from "../shared/utils/validators.js";
 
 /**
  * Payload esperado para S-2200.

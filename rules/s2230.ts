@@ -1,5 +1,5 @@
-import type { Rule } from "@/shared/types/index.js";
-import { isValidCPF, parseDate, isFutureDate } from "@/shared/utils/validators.js";
+import type { Rule } from "../shared/types.js";
+import { isValidCPF, parseDate, isFutureDate } from "../shared/utils/validators.js";
 
 export interface S2230Payload extends Record<string, unknown> {
   cpfTrab: unknown;

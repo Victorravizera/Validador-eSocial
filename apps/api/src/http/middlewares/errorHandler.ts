@@ -1,18 +1,14 @@
 import type { FastifyError, FastifyRequest, FastifyReply } from "fastify";
 import { ZodError } from "zod";
-import { AppError, isOperationalError } from "../../../../shared/errors.js";
-import { logger } from "../../../../shared/logger.js";
+import { AppError, isOperationalError } from "../../../../../shared/errors.js";
+import { logger } from "../../../../../shared/logger.js";
 
-export function errorHandler(
-  err: FastifyError | Error | unknown,
-  request: FastifyRequest,
-  reply: FastifyReply
-): void {
+export function errorHandler(err: FastifyError | Error | unknown, request: FastifyRequest, reply: FastifyReply): void {
   const requestId = (request.id as string) ?? "unknown";
 
   if (err instanceof ZodError) {
     const details = err.issues.map((i) => ({ field: i.path.join("."), message: i.message }));
-    reply.status(422).send({ error: { code: "VALIDATION_ERROR", message: "Dados de entrada inválidos", details }, requestId });
+    reply.status(422).send({ error: { code: "VALIDATION_ERROR", message: "Dados inválidos", details }, requestId });
     return;
   }
 
@@ -29,8 +25,5 @@ export function errorHandler(
   }
 
   logger.error({ err, requestId }, "Unhandled error");
-  reply.status(500).send({
-    error: { code: "INTERNAL_ERROR", message: "Erro interno. Nossa equipe foi notificada." },
-    requestId,
-  });
+  reply.status(500).send({ error: { code: "INTERNAL_ERROR", message: "Erro interno. Nossa equipe foi notificada." }, requestId });
 }

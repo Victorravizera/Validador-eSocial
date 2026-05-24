@@ -1,5 +1,5 @@
-import type { Rule } from "@/shared/types/index.js";
-import { isValidCPF, parsePeriod, isFutureDate, getSalarioMinimo } from "@/shared/utils/validators.js";
+import type { Rule } from "../shared/types.js";
+import { isValidCPF, parsePeriod, isFutureDate, getSalarioMinimo } from "../shared/utils/validators.js";
 
 export interface S1200Payload extends Record<string, unknown> {
   perApur: unknown;

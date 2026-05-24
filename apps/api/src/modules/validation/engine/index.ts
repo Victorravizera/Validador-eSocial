@@ -1,17 +1,12 @@
 import { performance } from "node:perf_hooks";
 import type {
-  EsocialEventId,
-  Rule,
-  ValidationIssue,
-  ValidationResult,
-  BatchValidationResult,
-  ValidateEventRequest,
-  ValidateBatchRequest,
-} from "../../../../shared/types.js";
-import { InvalidEventIdError } from "../../../../shared/errors.js";
-import { s2200Rules } from "../../../../rules/s2200.js";
-import { s2230Rules } from "../../../../rules/s2230.js";
-import { s1200Rules } from "../../../../rules/s1200.js";
+  EsocialEventId, Rule, ValidationIssue, ValidationResult,
+  BatchValidationResult, ValidateEventRequest, ValidateBatchRequest,
+} from "../../../../../../shared/types.js";
+import { InvalidEventIdError } from "../../../../../../shared/errors.js";
+import { s2200Rules } from "../../../../../../rules/s2200.js";
+import { s2230Rules } from "../../../../../../rules/s2230.js";
+import { s1200Rules } from "../../../../../../rules/s1200.js";
 
 const RULES_REGISTRY: Partial<Record<EsocialEventId, Rule[]>> = {
   "S-2200": s2200Rules as Rule[],
@@ -39,10 +34,8 @@ export function validateEvent(request: ValidateEventRequest): ValidationResult {
       }
     } catch {
       issues.push({
-        field: rule.field,
-        code: "RULE_EXECUTION_ERROR",
-        message: `Erro interno ao executar a regra ${rule.code}`,
-        severity: "error",
+        field: rule.field, code: "RULE_EXECUTION_ERROR",
+        message: `Erro interno ao executar a regra ${rule.code}`, severity: "error",
       });
       errorRuleCount++;
     }
@@ -50,20 +43,13 @@ export function validateEvent(request: ValidateEventRequest): ValidationResult {
 
   const errorRules = rules.filter((r) => r.severity === "error");
   const passedErrorRules = errorRules.length - errorRuleCount;
-  const score =
-    errorRules.length === 0
-      ? 100
-      : Math.round((passedErrorRules / errorRules.length) * 100);
-
+  const score = errorRules.length === 0 ? 100 : Math.round((passedErrorRules / errorRules.length) * 100);
   const hasErrors = issues.some((i) => i.severity === "error");
   const hasWarnings = issues.some((i) => i.severity === "warning");
   const status = hasErrors ? "FAIL" : hasWarnings ? "WARN" : "PASS";
 
   return {
-    eventId,
-    status,
-    score,
-    issues,
+    eventId, status, score, issues,
     passedRules: rules.length - issues.length,
     totalRules: rules.length,
     durationMs: Math.round(performance.now() - start),
@@ -74,7 +60,6 @@ export function validateBatch(request: ValidateBatchRequest): BatchValidationRes
   const { events, options } = request;
   const batchId = crypto.randomUUID();
   const start = performance.now();
-
   const results: ValidationResult[] = [];
   let passed = 0, failed = 0, warned = 0;
 
@@ -82,26 +67,16 @@ export function validateBatch(request: ValidateBatchRequest): BatchValidationRes
     const result = validateEvent({ ...event, options: { ...event.options, ...options } });
     results.push(result);
     if (result.status === "PASS") passed++;
-    else if (result.status === "FAIL") {
-      failed++;
-      if (options?.failFast) break;
-    } else warned++;
+    else if (result.status === "FAIL") { failed++; if (options?.failFast) break; }
+    else warned++;
   }
 
-  const overallScore =
-    results.length === 0
-      ? 0
-      : Math.round(results.reduce((acc, r) => acc + r.score, 0) / results.length);
+  const overallScore = results.length === 0 ? 0
+    : Math.round(results.reduce((acc, r) => acc + r.score, 0) / results.length);
 
   return {
-    batchId,
-    totalEvents: results.length,
-    passed,
-    failed,
-    warned,
-    overallScore,
-    results,
-    durationMs: Math.round(performance.now() - start),
+    batchId, totalEvents: results.length, passed, failed, warned,
+    overallScore, results, durationMs: Math.round(performance.now() - start),
   };
 }
 

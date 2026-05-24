@@ -20,7 +20,6 @@ async function main() {
       await app.close();
       await closeDb();
       await closeRedis();
-      logger.info("server:shutdown_complete");
       process.exit(0);
     } catch (err) {
       logger.error({ err }, "server:shutdown_error");
@@ -30,8 +29,8 @@ async function main() {
 
   process.on("SIGTERM", () => shutdown("SIGTERM"));
   process.on("SIGINT", () => shutdown("SIGINT"));
-  process.on("uncaughtException", (err) => { logger.fatal({ err }, "process:uncaught_exception"); process.exit(1); });
-  process.on("unhandledRejection", (reason) => { logger.fatal({ reason }, "process:unhandled_rejection"); process.exit(1); });
+  process.on("uncaughtException", (err) => { logger.fatal({ err }, "uncaught"); process.exit(1); });
+  process.on("unhandledRejection", (reason) => { logger.fatal({ reason }, "unhandled"); process.exit(1); });
 }
 
 main();

@@ -35,15 +35,13 @@ export async function buildApp() {
       error: { code: "RATE_LIMITED", message: `Muitas requisições. Aguarde ${Math.ceil(ctx.ttl / 1000)}s.` },
     }),
   });
-
   await app.register(swagger, {
     openapi: {
-      info: { title: "eSocial QA Validator API", description: "Validação automatizada de eventos trabalhistas", version: "1.0.0" },
+      info: { title: "eSocial QA Validator API", description: "Validação de eventos trabalhistas", version: "1.0.0" },
       components: { securitySchemes: { apiKey: { type: "apiKey", in: "header", name: "X-API-Key" } } },
     },
   });
   await app.register(swaggerUi, { routePrefix: "/docs", staticCSP: true });
-
   await app.register(healthRoute);
   await app.register(async (v1) => {
     await v1.register(authRoutes);
@@ -54,13 +52,10 @@ export async function buildApp() {
   }, { prefix: "/v1" });
 
   app.setErrorHandler(errorHandler);
-
   app.addHook("onResponse", (request, reply, done) => {
     logger.info({
-      method: request.method, url: request.url,
-      statusCode: reply.statusCode,
-      durationMs: Math.round(reply.elapsedTime),
-      requestId: request.id, tenantId: request.tenant?.id,
+      method: request.method, url: request.url, statusCode: reply.statusCode,
+      durationMs: Math.round(reply.elapsedTime), requestId: request.id, tenantId: request.tenant?.id,
     }, "request:completed");
     done();
   });
