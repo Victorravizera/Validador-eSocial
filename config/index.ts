@@ -19,7 +19,7 @@ const envSchema = z.object({
   DATABASE_POOL_MAX: z.coerce.number().int().min(2).default(10),
 
   // Redis
-  REDIS_URL: z.string().url("REDIS_URL deve ser uma URL válida (redis://...)"),
+  REDIS_URL: z.string().url().optional(),
 
   // Auth
   JWT_SECRET: z
@@ -79,7 +79,7 @@ export const config = {
     poolMax: env.DATABASE_POOL_MAX,
   },
   redis: {
-    url: env.REDIS_URL,
+    url: env.REDIS_URL ?? "",
   },
   auth: {
     jwtSecret: env.JWT_SECRET,
