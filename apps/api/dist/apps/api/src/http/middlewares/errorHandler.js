@@ -21,6 +21,9 @@ function errorHandler(err, request, reply) {
         reply.status(status).send({ error: { code: "REQUEST_ERROR", message: err.message }, requestId });
         return;
     }
-    logger_js_1.logger.error({ err, requestId }, "Unhandled error");
-    reply.status(500).send({ error: { code: "INTERNAL_ERROR", message: "Erro interno. Nossa equipe foi notificada." }, requestId });
+    logger_js_1.logger.error({
+        err: err instanceof Error ? { message: err.message, stack: err.stack, name: err.name } : err,
+        requestId
+    }, "Unhandled error");
+    logger_js_1.logger.error({ err, requestId, stack: err instanceof Error ? err.stack : undefined }, "Unhandled error");
 }
