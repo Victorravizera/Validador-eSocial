@@ -24,12 +24,21 @@ export function errorHandler(err: FastifyError | Error | unknown, request: Fasti
     return;
   }
 
-  logger.error({ 
-  err: err instanceof Error ? { message: err.message, stack: err.stack, name: err.name } : err, 
-  requestId 
-}, "Unhandled error");
+  // Log detalhado do erro inesperado
+  const errorDetails = err instanceof Error ? {
+    message: err.message,
+    name: err.name,
+    stack: err.stack,
+    cause: (err as any).cause,
+  } : { raw: JSON.stringify(err) };
 
-  logger.error({ err, requestId, stack: err instanceof Error ? err.stack : undefined }, "Unhandled error");
+  logger.error({ error: errorDetails, requestId }, "Unhandled error");
+
+  reply.status(500).send({
+    error: {
+      code: "INTERNAL_ERROR",
+      message: err instanceof Error ? err.message : "Erro interno",
+    },
+    requestId,
+  });
 }
-
-

@@ -21,9 +21,19 @@ function errorHandler(err, request, reply) {
         reply.status(status).send({ error: { code: "REQUEST_ERROR", message: err.message }, requestId });
         return;
     }
-    logger_js_1.logger.error({
-        err: err instanceof Error ? { message: err.message, stack: err.stack, name: err.name } : err,
-        requestId
-    }, "Unhandled error");
-    logger_js_1.logger.error({ err, requestId, stack: err instanceof Error ? err.stack : undefined }, "Unhandled error");
+    // Log detalhado do erro inesperado
+    const errorDetails = err instanceof Error ? {
+        message: err.message,
+        name: err.name,
+        stack: err.stack,
+        cause: err.cause,
+    } : { raw: JSON.stringify(err) };
+    logger_js_1.logger.error({ error: errorDetails, requestId }, "Unhandled error");
+    reply.status(500).send({
+        error: {
+            code: "INTERNAL_ERROR",
+            message: err instanceof Error ? err.message : "Erro interno",
+        },
+        requestId,
+    });
 }
