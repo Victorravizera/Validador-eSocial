@@ -2,7 +2,7 @@ import pino from "pino";
 import { config } from "../config/index.js";
 
 export const logger = pino({
-  level: config.server.logLevel,
+  level: "debug",
   redact: {
     paths: [
       "password", "senha", "token", "accessToken", "refreshToken",
@@ -12,9 +12,6 @@ export const logger = pino({
     ],
     censor: "[REDACTED]",
   },
-  transport: config.server.isDev
-    ? { target: "pino-pretty", options: { colorize: true, translateTime: "HH:MM:ss" } }
-    : undefined,
   base: {
     service: "esocial-qa-api",
     env: config.server.env,
@@ -23,7 +20,7 @@ export const logger = pino({
     err: (err: Error) => ({
       type: err.constructor.name,
       message: err.message,
-      stack: config.server.isDev ? err.stack : undefined,
+      stack: err.stack,
     }),
   },
 });

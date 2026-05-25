@@ -7,7 +7,7 @@ exports.logger = void 0;
 const pino_1 = __importDefault(require("pino"));
 const index_js_1 = require("../config/index.js");
 exports.logger = (0, pino_1.default)({
-    level: index_js_1.config.server.logLevel,
+    level: "debug",
     redact: {
         paths: [
             "password", "senha", "token", "accessToken", "refreshToken",
@@ -17,9 +17,6 @@ exports.logger = (0, pino_1.default)({
         ],
         censor: "[REDACTED]",
     },
-    transport: index_js_1.config.server.isDev
-        ? { target: "pino-pretty", options: { colorize: true, translateTime: "HH:MM:ss" } }
-        : undefined,
     base: {
         service: "esocial-qa-api",
         env: index_js_1.config.server.env,
@@ -28,7 +25,7 @@ exports.logger = (0, pino_1.default)({
         err: (err) => ({
             type: err.constructor.name,
             message: err.message,
-            stack: index_js_1.config.server.isDev ? err.stack : undefined,
+            stack: err.stack,
         }),
     },
 });
